@@ -4,8 +4,8 @@
 
 export const LOBE_CHAT_CLOUD = 'LobeHub Cloud';
 
-export const BRANDING_NAME = 'LobeHub';
-export const BRANDING_LOGO_URL = '';
+export const BRANDING_NAME: string = '阿川 AI';
+export const BRANDING_LOGO_URL = '/achuan-ai-logo.png';
 
 export const ORG_NAME = 'LobeHub';
 
