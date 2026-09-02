@@ -1,3 +1,5 @@
+import { resolve } from 'node:path';
+
 import type { NextConfig } from 'next';
 
 import { defineConfig } from './src/libs/next/config/define-config';
@@ -30,7 +32,13 @@ const netlifyConfig: Pick<NextConfig, 'experimental' | 'webpack'> = {
     webpackBuildWorker: true,
     webpackMemoryOptimizations: true,
   },
-  webpack(config) {
+  webpack(config, { nextRuntime }) {
+    if (nextRuntime === 'edge') {
+      config.resolve.alias = {
+        ...config.resolve.alias,
+        '@/auth': resolve(process.cwd(), 'src/libs/next/proxy/netlify-edge-auth-stub.ts'),
+      };
+    }
     config.module.rules.push({ test: /\.md$/, type: 'asset/source' });
     config.resolve.fallback = { ...config.resolve.fallback, 'zlib-sync': false };
     return config;
