@@ -2,12 +2,10 @@ import { Flexbox } from '@lobehub/ui';
 import { Text } from '@lobehub/ui/base-ui';
 import { createStaticStyles } from 'antd-style';
 import { memo } from 'react';
-import { useTranslation } from 'react-i18next';
-
-import { useUserStore } from '@/store/user';
-import { authSelectors, userProfileSelectors } from '@/store/user/slices/auth/selectors';
 
 import AgentSelect from './AgentSelect';
+
+const SLOGAN = '你的专属 AI 助手';
 
 const styles = createStaticStyles(({ css }) => ({
   // The measure comes from the layout (`--home-greeting-measure`), which derives
@@ -34,26 +32,11 @@ const styles = createStaticStyles(({ css }) => ({
   `,
 }));
 
-const getGreetingKey = (hour: number): 'afternoon' | 'evening' | 'morning' => {
-  if (hour < 12) return 'morning';
-  if (hour < 18) return 'afternoon';
-  return 'evening';
-};
-
 interface HomeHeaderProps {
   centered?: boolean;
 }
 
 const HomeHeader = memo<HomeHeaderProps>(({ centered }) => {
-  const { t } = useTranslation('home');
-  const displayName = useUserStore(userProfileSelectors.displayUserName);
-  const isLogin = useUserStore(authSelectors.isLogin);
-
-  const greetingKey = getGreetingKey(new Date().getHours());
-  const greeting = isLogin
-    ? t(`dashboard.greeting.${greetingKey}`, { name: displayName })
-    : t(`dashboard.greeting.${greetingKey}Guest`);
-
   return (
     // Minimal mode keeps the full layout's stacking order — the switcher names
     // who speaks, the greeting answers below — but drops the toolbar chrome and
@@ -68,7 +51,7 @@ const HomeHeader = memo<HomeHeaderProps>(({ centered }) => {
         </Flexbox>
       )}
       <Text as={'h1'} className={styles.greeting} weight={600}>
-        {greeting}
+        {SLOGAN}
       </Text>
     </Flexbox>
   );

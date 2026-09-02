@@ -25,6 +25,24 @@ import { preferenceSelectors, userGeneralSettingsSelectors } from '@/store/user/
 import { GlobalStyle } from '@/styles';
 import { setCookie } from '@/utils/client/cookie';
 
+const deepPurpleTheme = {
+  colorBgBase: '#120820',
+  colorBgContainer: '#1b0f30',
+  colorBgElevated: '#281744',
+  colorBgLayout: '#0f061c',
+  colorBorder: 'rgba(224, 210, 255, 0.2)',
+  colorBorderSecondary: 'rgba(224, 210, 255, 0.12)',
+  colorFill: 'rgba(232, 222, 255, 0.18)',
+  colorFillQuaternary: 'rgba(232, 222, 255, 0.06)',
+  colorFillSecondary: 'rgba(232, 222, 255, 0.12)',
+  colorFillTertiary: 'rgba(232, 222, 255, 0.09)',
+  colorText: '#f8f4ff',
+  colorTextBase: '#f8f4ff',
+  colorTextQuaternary: 'rgba(248, 244, 255, 0.45)',
+  colorTextSecondary: 'rgba(248, 244, 255, 0.72)',
+  colorTextTertiary: 'rgba(248, 244, 255, 0.58)',
+};
+
 const styles = createStaticStyles(({ css, cssVar }) => ({
   app: css`
     position: relative;
@@ -172,6 +190,7 @@ const AppTheme = memo<AppThemeProps>(
         theme={{
           cssVar: { key: 'lobe-vars' },
           token: {
+            ...deepPurpleTheme,
             fontFamily,
             fontFamilyCode,
             motion: animationMode !== 'disabled',
