@@ -44,7 +44,6 @@ const netlifyConfig: Pick<NextConfig, 'experimental' | 'webpack'> = {
     if (nextRuntime !== 'nodejs') {
       config.resolve.alias = {
         ...config.resolve.alias,
-        '@/auth': resolve(process.cwd(), 'src/libs/next/proxy/netlify-edge-auth-stub.ts'),
         './instrumentation.node': resolve(
           process.cwd(),
           'src/libs/next/proxy/netlify-edge-instrumentation-stub.ts',

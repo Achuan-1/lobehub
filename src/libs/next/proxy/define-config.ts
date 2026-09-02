@@ -4,7 +4,6 @@ import { NextResponse } from 'next/server';
 import { UAParser } from 'ua-parser-js';
 import urlJoin from 'url-join';
 
-import { auth } from '@/auth';
 import { LOBE_LOCALE_COOKIE } from '@/const/locale';
 import { appEnv } from '@/envs/app';
 import { authEnv } from '@/envs/auth';
@@ -276,10 +275,26 @@ export function defineConfig() {
       return response;
     }
 
-    // Get full session with user data (Next.js 15.2.0+ feature)
-    const session = await auth.api.getSession({
-      headers: req.headers,
-    });
+    // Keep Node-only Better Auth dependencies out of the middleware bundle.
+    // API routes are excluded from this middleware's matcher, so this internal
+    // request cannot recurse back into the middleware.
+    const sessionHeaders = new Headers();
+    const cookie = req.headers.get('cookie');
+    const authorization = req.headers.get('authorization');
+
+    if (cookie) sessionHeaders.set('cookie', cookie);
+    if (authorization) sessionHeaders.set('authorization', authorization);
+
+    const session = await fetch(new URL('/api/auth/get-session', req.url), {
+      headers: sessionHeaders,
+    })
+      .then(async (response) =>
+        response.ok ? ((await response.json()) as { user?: { id?: string } } | null) : null,
+      )
+      .catch((error) => {
+        logBetterAuth('Failed to load Better Auth session: %O', error);
+        return null;
+      });
 
     const isLoggedIn = !!session?.user;
 
