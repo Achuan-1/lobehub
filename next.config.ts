@@ -1,3 +1,5 @@
+import type { NextConfig } from 'next';
+
 import { defineConfig } from './src/libs/next/config/define-config';
 
 const isVercel = !!process.env.VERCEL_ENV;
@@ -22,9 +24,22 @@ const serverlessConfig = {
     ],
   },
 };
+
+const netlifyConfig: Pick<NextConfig, 'experimental' | 'webpack'> = {
+  experimental: {
+    webpackBuildWorker: true,
+    webpackMemoryOptimizations: true,
+  },
+  webpack(config) {
+    config.module.rules.push({ test: /\.md$/, type: 'asset/source' });
+    config.resolve.fallback = { ...config.resolve.fallback, 'zlib-sync': false };
+    return config;
+  },
+};
+
 const nextConfig = defineConfig({
   ...(isVercel || isNetlify ? serverlessConfig : {}),
-  ...(isNetlify ? { experimental: { webpackMemoryOptimizations: true } } : {}),
+  ...(isNetlify ? netlifyConfig : {}),
 });
 
 export default nextConfig;

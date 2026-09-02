@@ -12,6 +12,7 @@ interface CustomNextConfig {
   redirects?: Redirect[];
   serverExternalPackages?: NextConfig['serverExternalPackages'];
   turbopack?: NextConfig['turbopack'];
+  webpack?: NextConfig['webpack'];
 }
 
 export function defineConfig(config: CustomNextConfig) {
@@ -363,6 +364,7 @@ export function defineConfig(config: CustomNextConfig) {
     ],
 
     transpilePackages: ['mermaid'],
+    ...(config.webpack && { webpack: config.webpack }),
     turbopack: {
       rules: {
         ...(isTest
