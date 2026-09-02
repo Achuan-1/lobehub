@@ -3,6 +3,7 @@ command = "rm -rf .next node_modules/.cache && pnpm run build:netlify && pnpm ru
 publish = ".next"
 
 [build.environment]
+NEXT_DISABLE_NETLIFY_EDGE = "true"
 NODE_OPTIONS = "--max-old-space-size=4096"
 
 [[plugins]]
