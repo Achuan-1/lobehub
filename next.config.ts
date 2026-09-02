@@ -1,14 +1,18 @@
 import { defineConfig } from './src/libs/next/config/define-config';
 
 const isVercel = !!process.env.VERCEL_ENV;
+const isNetlify = process.env.NETLIFY === 'true';
 
-const vercelConfig = {
-  // Vercel serverless optimization: exclude musl binaries from all routes
-  // Vercel uses Amazon Linux (glibc), not Alpine Linux (musl)
-  // This saves ~16MB (sharp-musl) per serverless function
+const serverlessConfig = {
+  // Keep optional local-runtime binaries out of serverless functions. They are
+  // only used by desktop/local agent features and can exceed provider limits.
   outputFileTracingExcludes: {
     '*': [
       'node_modules/.pnpm/@img+sharp-libvips-*musl*',
+      'node_modules/.pnpm/@anthropic-ai+claude-agent-sdk-*/**',
+      'node_modules/@anthropic-ai/claude-agent-sdk-*/**',
+      'node_modules/.pnpm/ffmpeg-static@*/**',
+      'node_modules/ffmpeg-static/**',
       // Exclude SPA/desktop/mobile build artifacts from serverless functions
       'public/_spa/**',
       'dist/desktop/**',
@@ -19,7 +23,7 @@ const vercelConfig = {
   },
 };
 const nextConfig = defineConfig({
-  ...(isVercel ? vercelConfig : {}),
+  ...(isVercel || isNetlify ? serverlessConfig : {}),
 });
 
 export default nextConfig;
