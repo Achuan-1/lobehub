@@ -33,10 +33,19 @@ const netlifyConfig: Pick<NextConfig, 'experimental' | 'webpack'> = {
     webpackMemoryOptimizations: true,
   },
   webpack(config, { nextRuntime }) {
+    // Some packages (such as epub2) reference their own files without a
+    // leading "./". Prefer the package-local file before looking in
+    // node_modules so those imports remain resolvable in the server bundle.
+    config.resolve.preferRelative = true;
+
     if (nextRuntime === 'edge') {
       config.resolve.alias = {
         ...config.resolve.alias,
         '@/auth': resolve(process.cwd(), 'src/libs/next/proxy/netlify-edge-auth-stub.ts'),
+        './instrumentation.node': resolve(
+          process.cwd(),
+          'src/libs/next/proxy/netlify-edge-instrumentation-stub.ts',
+        ),
       };
     }
     config.module.rules.push({ test: /\.md$/, type: 'asset/source' });
