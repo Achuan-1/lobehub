@@ -1,5 +1,5 @@
 [build]
-command = "rm -rf .next node_modules/.cache && pnpm run build && pnpm run db:migrate && pnpm run db:seed-public-user"
+command = "rm -rf .next node_modules/.cache && pnpm run build:netlify && pnpm run db:migrate && pnpm run db:seed-public-user"
 publish = ".next"
 
 [build.environment]
