@@ -126,6 +126,7 @@ CLAUDE.local.md
 
 # Docker development data
 docker-compose/dev/data/
+docker-compose/production/grafana/init_data.local.json
 
 # Migration scripts data
 .elasticsearch-reindex/

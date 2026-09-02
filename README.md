@@ -66,7 +66,7 @@ Windows PowerShell：
 Copy-Item .env.example.development .env.development.local
 ```
 
-根据需要编辑 `.env.development.local`，至少配置一个可用的模型服务密钥，例如 `OPENAI_API_KEY`。示例文件中的密钥和密码只适用于本地开发，请勿用于生产环境。
+编辑 `.env.development.local`，将所有 `REPLACE_WITH_*` 占位符替换为独立的强随机值。可以分别使用 `openssl rand -base64 32` 生成 `KEY_VAULTS_SECRET` 和 `AUTH_SECRET`。同时至少配置一个可用的模型服务密钥，例如 `OPENAI_API_KEY`；不要提交生成后的本地环境文件。
 
 #### 5. 启动项目
 
@@ -160,7 +160,7 @@ Windows PowerShell:
 Copy-Item .env.example.development .env.development.local
 ```
 
-Edit `.env.development.local` as needed and configure at least one model provider key, such as `OPENAI_API_KEY`. The secrets and passwords in the example file are for local development only and must not be used in production.
+Edit `.env.development.local` and replace every `REPLACE_WITH_*` placeholder with an independent, cryptographically strong value. You can run `openssl rand -base64 32` separately for `KEY_VAULTS_SECRET` and `AUTH_SECRET`. Configure at least one model provider key, such as `OPENAI_API_KEY`, and never commit the generated local environment file.
 
 #### 5. Start the Project
 
