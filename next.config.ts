@@ -38,7 +38,10 @@ const netlifyConfig: Pick<NextConfig, 'experimental' | 'webpack'> = {
     // node_modules so those imports remain resolvable in the server bundle.
     config.resolve.preferRelative = true;
 
-    if (nextRuntime === 'edge') {
+    // Next.js 16 can leave nextRuntime undefined while compiling legacy
+    // middleware.ts. Only the explicit Node server build may include the full
+    // Better Auth and OpenTelemetry implementations.
+    if (nextRuntime !== 'nodejs') {
       config.resolve.alias = {
         ...config.resolve.alias,
         '@/auth': resolve(process.cwd(), 'src/libs/next/proxy/netlify-edge-auth-stub.ts'),
