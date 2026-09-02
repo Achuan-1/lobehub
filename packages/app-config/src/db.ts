@@ -5,9 +5,13 @@ export const getServerDBConfig = () => {
   return createEnv({
     runtimeEnv: {
       DATABASE_DRIVER: process.env.DATABASE_DRIVER || 'neon',
+      DATABASE_POOL_MAX: process.env.DATABASE_POOL_MAX,
       DATABASE_STATEMENT_TIMEOUT: process.env.DATABASE_STATEMENT_TIMEOUT,
       DATABASE_TEST_URL: process.env.DATABASE_TEST_URL,
-      DATABASE_URL: process.env.DATABASE_URL,
+      // Netlify Database exposes its managed Postgres connection through
+      // NETLIFY_DB_URL. Keep DATABASE_URL as the explicit override for other
+      // hosting providers and local development.
+      DATABASE_URL: process.env.DATABASE_URL || process.env.NETLIFY_DB_URL,
 
       KEY_VAULTS_SECRET: process.env.KEY_VAULTS_SECRET,
 
@@ -15,6 +19,7 @@ export const getServerDBConfig = () => {
     },
     server: {
       DATABASE_DRIVER: z.enum(['neon', 'node']),
+      DATABASE_POOL_MAX: z.coerce.number().int().positive().optional(),
       // Server-side timeout (in milliseconds) for a single SQL statement.
       // When set, Postgres aborts any statement running longer than this,
       // preventing a stuck query (e.g. lock contention) from blocking indefinitely.

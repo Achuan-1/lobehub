@@ -263,14 +263,20 @@ describe('checkAuth', () => {
       );
     });
 
-    it('should not mock user in production', async () => {
+    it('should use explicitly enabled mock user in production', async () => {
       vi.stubEnv('NODE_ENV', 'production');
       vi.stubEnv('ENABLE_MOCK_DEV_USER', '1');
       vi.stubEnv('MOCK_DEV_USER_ID', 'mock-user-123');
 
       await checkAuth(mockHandler)(mockRequest, mockOptions);
 
-      expect(mockHandler).not.toHaveBeenCalled();
+      expect(mockHandler).toHaveBeenCalledWith(
+        expect.any(Request),
+        expect.objectContaining({
+          jwtPayload: { userId: 'mock-user-123' },
+          userId: 'mock-user-123',
+        }),
+      );
     });
   });
 });

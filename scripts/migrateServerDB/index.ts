@@ -38,7 +38,11 @@ const runMigrations = async () => {
   process.exit(0);
 };
 
-const connectionString = process.env.DATABASE_URL;
+const connectionString = process.env.DATABASE_URL || process.env.NETLIFY_DB_URL;
+
+// Netlify Database provides NETLIFY_DB_URL automatically during builds.
+// Normalize it for the existing database adapter and migration tooling.
+if (connectionString && !process.env.DATABASE_URL) process.env.DATABASE_URL = connectionString;
 
 // only migrate database if the connection string is available
 if (connectionString) {

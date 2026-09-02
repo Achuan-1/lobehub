@@ -29,12 +29,23 @@ export class FileService {
   private userId: string;
   private fileModel: FileModel;
 
-  private impl: FileServiceImpl;
+  private db: LobeChatDatabase;
+  private _impl?: FileServiceImpl;
 
   constructor(db: LobeChatDatabase, userId: string, workspaceId?: string) {
+    this.db = db;
     this.userId = userId;
     this.fileModel = new FileModel(db, userId, workspaceId);
-    this.impl = createFileServiceModule(db);
+  }
+
+  /**
+   * Initialize object storage only when a file operation actually needs it.
+   * Plain-text chat and empty file lists must keep working when S3 is not
+   * configured in a local development environment.
+   */
+  private get impl(): FileServiceImpl {
+    this._impl ??= createFileServiceModule(this.db);
+    return this._impl;
   }
 
   /**

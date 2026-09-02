@@ -153,7 +153,7 @@ export const createLambdaContext = async (request: NextRequest): Promise<LambdaC
   const isDebugApi = request.headers.get('lobe-auth-dev-backend-api') === '1';
   const isMockUser = process.env.ENABLE_MOCK_DEV_USER === '1';
 
-  if (process.env.NODE_ENV === 'development' && (isDebugApi || isMockUser)) {
+  if (isMockUser || (process.env.NODE_ENV === 'development' && isDebugApi)) {
     return createContextInner({
       clientMetadata,
       userId: process.env.MOCK_DEV_USER_ID,

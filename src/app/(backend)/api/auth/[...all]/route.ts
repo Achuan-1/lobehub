@@ -7,6 +7,38 @@ const jsonContentTypeRegex = /^application\/(?:[a-z0-9.+-]*\+)?json/i;
 
 const handler = toNextJsHandler(auth);
 
+const getMockSession = (request: NextRequest) => {
+  const isMockSessionRequest =
+    process.env.ENABLE_MOCK_DEV_USER === '1' &&
+    new URL(request.url).pathname === '/api/auth/get-session';
+
+  if (!isMockSessionRequest) return;
+
+  const userId = process.env.MOCK_DEV_USER_ID || 'DEV_USER';
+  const now = new Date();
+  const expiresAt = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+
+  return Response.json({
+    session: {
+      createdAt: now,
+      expiresAt,
+      id: `mock-session-${userId}`,
+      token: `mock-token-${userId}`,
+      updatedAt: now,
+      userId,
+    },
+    user: {
+      createdAt: now,
+      email: 'local-dev@localhost',
+      emailVerified: true,
+      id: userId,
+      name: 'Local User',
+      updatedAt: now,
+      username: 'local-user',
+    },
+  });
+};
+
 const malformedJsonResponse = () =>
   Response.json({ code: 'INVALID_JSON', message: 'Malformed JSON request body' }, { status: 400 });
 
@@ -26,7 +58,7 @@ const validateJsonBody = async (request: Request) => {
   }
 };
 
-export const GET = handler.GET;
+export const GET = async (request: NextRequest) => getMockSession(request) || handler.GET(request);
 
 export const POST = async (request: NextRequest) => {
   const invalidJsonResponse = await validateJsonBody(request);

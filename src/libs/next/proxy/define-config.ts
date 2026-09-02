@@ -270,6 +270,12 @@ export function defineConfig() {
     // Skip session lookup for public routes to reduce latency
     if (!isProtected) return response;
 
+    // Explicit single-user deployments can opt into mock-user mode without a
+    // Better Auth cookie. The API and tRPC layers use the same guarded flag.
+    if (process.env.ENABLE_MOCK_DEV_USER === '1') {
+      return response;
+    }
+
     // Get full session with user data (Next.js 15.2.0+ feature)
     const session = await auth.api.getSession({
       headers: req.headers,

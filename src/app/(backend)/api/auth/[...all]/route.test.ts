@@ -1,6 +1,6 @@
 // @vitest-environment node
 import type { NextRequest } from 'next/server';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { GET, POST } from './route';
 
@@ -30,6 +30,10 @@ const createPostRequest = (body: string, contentType = 'application/json') =>
   }) as NextRequest;
 
 describe('/api/auth/[...all] route', () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
   beforeEach(() => {
     vi.clearAllMocks();
     mocks.get.mockResolvedValue(Response.json({ ok: true }));
@@ -84,5 +88,21 @@ describe('/api/auth/[...all] route', () => {
 
     expect(response.status).toBe(200);
     expect(mocks.get).toHaveBeenCalledWith(request);
+  });
+
+  it('returns a shared session when mock-user mode is enabled', async () => {
+    vi.stubEnv('NODE_ENV', 'production');
+    vi.stubEnv('ENABLE_MOCK_DEV_USER', '1');
+    vi.stubEnv('MOCK_DEV_USER_ID', 'local-dev-user');
+    const request = new Request('https://localhost/api/auth/get-session') as NextRequest;
+
+    const response = await GET(request);
+    const result = await response.json();
+
+    expect(result.user).toMatchObject({
+      email: 'local-dev@localhost',
+      id: 'local-dev-user',
+    });
+    expect(mocks.get).not.toHaveBeenCalled();
   });
 });

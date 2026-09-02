@@ -18,11 +18,11 @@ const log = debug('lobe-hono:auth-middleware');
  * Supports both OIDC tokens and API keys via Bearer token
  */
 export const userAuthMiddleware = async (c: Context, next: Next) => {
-  // Development mode debug bypass
+  // Explicit single-user mode or development-only debug bypass
   const isDebugApi = c.req.header('lobe-auth-dev-backend-api') === '1';
   const isMockUser = process.env.ENABLE_MOCK_DEV_USER === '1';
-  if (process.env.NODE_ENV === 'development' && (isDebugApi || isMockUser)) {
-    log('Development debug mode, using mock user ID');
+  if (isMockUser || (process.env.NODE_ENV === 'development' && isDebugApi)) {
+    log('Mock user mode, using configured user ID');
     c.set('userId', process.env.MOCK_DEV_USER_ID || 'DEV_USER');
     c.set('authType', 'debug');
     return next();

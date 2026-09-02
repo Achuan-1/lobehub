@@ -71,7 +71,7 @@ export const checkAuth =
     // we have a special header to debug the api endpoint in development mode
     const isDebugApi = req.headers.get('lobe-auth-dev-backend-api') === '1';
     const isMockUser = process.env.ENABLE_MOCK_DEV_USER === '1';
-    if (process.env.NODE_ENV === 'development' && (isDebugApi || isMockUser)) {
+    if (isMockUser || (process.env.NODE_ENV === 'development' && isDebugApi)) {
       const mockUserId = process.env.MOCK_DEV_USER_ID || 'DEV_USER';
       return handler(clonedReq, {
         ...options,
