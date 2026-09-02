@@ -23,6 +23,7 @@ import HomeModeContent from './HomeModeContent';
 import HomePortrait from './HomePortrait';
 import InputArea from './InputArea';
 import PortraitBubble from './PortraitBubble';
+import QuickStartGuide from './QuickStartGuide';
 import { RAIL_INBOX_PROPS, resolveRailVisibility } from './railVisibility';
 import type { HomeMode } from './types';
 
@@ -348,14 +349,15 @@ const Home = memo(() => {
     return (
       <Flexbox className={styles.minimal} gap={MINIMAL_STACK_GAP}>
         <HomeHeader centered />
-        <div className={styles.inputArea}>
+        <Flexbox className={styles.inputArea} gap={12}>
+          <QuickStartGuide />
           <InputArea
             inputValue={inputValue}
             mode={mode}
             onInputValueChange={handleInputValueChange}
             onModeChange={setMode}
           />
-        </div>
+        </Flexbox>
       </Flexbox>
     );
 
@@ -384,6 +386,7 @@ const Home = memo(() => {
         gap={24}
       >
         <Flexbox className={styles.inputArea} gap={12}>
+          <QuickStartGuide />
           <InputArea
             showNewModelShortcuts
             inputValue={inputValue}
