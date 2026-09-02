@@ -24,6 +24,7 @@ const serverlessConfig = {
 };
 const nextConfig = defineConfig({
   ...(isVercel || isNetlify ? serverlessConfig : {}),
+  ...(isNetlify ? { experimental: { webpackMemoryOptimizations: true } } : {}),
 });
 
 export default nextConfig;
