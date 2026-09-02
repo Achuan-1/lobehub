@@ -1,3 +1,5 @@
+import { cpSync, mkdtempSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import path from 'node:path';
 
 import * as dotenv from 'dotenv';
@@ -21,15 +23,41 @@ dotenvExpand.expand(dotenv.config({ override: true, path: `.env.${env}.local` })
 
 const migrationsFolder = path.join(__dirname, '../../packages/database/migrations');
 
+const getMigrationsFolder = () => {
+  if (!process.env.NETLIFY_DB_URL) return migrationsFolder;
+
+  // Netlify Database currently runs on Neon, where the deprecated ParadeDB
+  // `pg_search` extension cannot be installed. Keep the migration journal in
+  // sync while skipping only the optional full-text-search extension/indexes.
+  const netlifyMigrationsFolder = mkdtempSync(
+    path.join(tmpdir(), 'lobehub-netlify-migrations-'),
+  );
+  cpSync(migrationsFolder, netlifyMigrationsFolder, { recursive: true });
+
+  for (const filename of [
+    '0090_enable_pg_search.sql',
+    '0093_add_bm25_indexes_with_icu.sql',
+  ]) {
+    writeFileSync(
+      path.join(netlifyMigrationsFolder, filename),
+      '-- pg_search is unavailable on Netlify Database; intentionally skipped.\nSELECT 1;\n',
+    );
+  }
+
+  return netlifyMigrationsFolder;
+};
+
 const runMigrations = async () => {
   const { serverDB } = await import('../../packages/database/src/server');
 
   const time = Date.now();
   await runWithLockRetry(async () => {
+    const effectiveMigrationsFolder = getMigrationsFolder();
+
     if (process.env.DATABASE_DRIVER === 'node') {
-      await nodeMigrate(serverDB, { migrationsFolder });
+      await nodeMigrate(serverDB, { migrationsFolder: effectiveMigrationsFolder });
     } else {
-      await neonMigrate(serverDB, { migrationsFolder });
+      await neonMigrate(serverDB, { migrationsFolder: effectiveMigrationsFolder });
     }
   });
 
