@@ -33,10 +33,17 @@ const netlifyConfig: Pick<NextConfig, 'experimental' | 'webpack'> = {
     webpackMemoryOptimizations: true,
   },
   webpack(config, { nextRuntime }) {
-    // Some packages (such as epub2) reference their own files without a
-    // leading "./". Prefer the package-local file before looking in
-    // node_modules so those imports remain resolvable in the server bundle.
-    config.resolve.preferRelative = true;
+    // epub2 optionally loads the native `zipfile` package inside a try/catch
+    // and falls back to adm-zip when it is unavailable. Webpack resolves the
+    // optional import eagerly, so provide a throwing module that preserves the
+    // package's intended fallback behavior without changing global resolution.
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      'zipfile$': resolve(
+        process.cwd(),
+        'src/libs/document-loaders/loaders/epub/zipfile-unavailable.cjs',
+      ),
+    };
 
     // Next.js 16 can leave nextRuntime undefined while compiling legacy
     // middleware.ts. Only the explicit Node server build may include the full
