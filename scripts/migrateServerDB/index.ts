@@ -8,6 +8,7 @@ import { migrate as neonMigrate } from 'drizzle-orm/neon-serverless/migrator';
 import { migrate as nodeMigrate } from 'drizzle-orm/node-postgres/migrator';
 
 // @ts-ignore tsgo handle esm import cjs and compatibility issues
+import { shouldSkipPgSearchMigrations } from './compatibility';
 import { DB_FAIL_INIT_HINT, DUPLICATE_EMAIL_HINT, PGVECTOR_HINT } from './errorHint';
 import { runWithLockRetry } from './retry';
 
@@ -24,27 +25,27 @@ dotenvExpand.expand(dotenv.config({ override: true, path: `.env.${env}.local` })
 const migrationsFolder = path.join(__dirname, '../../packages/database/migrations');
 
 const getMigrationsFolder = () => {
-  if (!process.env.NETLIFY_DB_URL) return migrationsFolder;
+  if (!shouldSkipPgSearchMigrations(process.env)) return migrationsFolder;
 
-  // Netlify Database currently runs on Neon, where the deprecated ParadeDB
-  // `pg_search` extension cannot be installed. Keep the migration journal in
-  // sync while skipping only the optional full-text-search extension/indexes.
-  const netlifyMigrationsFolder = mkdtempSync(
-    path.join(tmpdir(), 'lobehub-netlify-migrations-'),
+  // Managed Neon databases no longer allow the deprecated ParadeDB `pg_search`
+  // extension. Keep the migration journal in sync while skipping only the
+  // optional full-text-search extension and indexes.
+  const compatibleMigrationsFolder = mkdtempSync(
+    path.join(tmpdir(), 'lobehub-compatible-migrations-'),
   );
-  cpSync(migrationsFolder, netlifyMigrationsFolder, { recursive: true });
+  cpSync(migrationsFolder, compatibleMigrationsFolder, { recursive: true });
 
   for (const filename of [
     '0090_enable_pg_search.sql',
     '0093_add_bm25_indexes_with_icu.sql',
   ]) {
     writeFileSync(
-      path.join(netlifyMigrationsFolder, filename),
-      '-- pg_search is unavailable on Netlify Database; intentionally skipped.\nSELECT 1;\n',
+      path.join(compatibleMigrationsFolder, filename),
+      '-- pg_search is unavailable on this managed Neon database; intentionally skipped.\nSELECT 1;\n',
     );
   }
 
-  return netlifyMigrationsFolder;
+  return compatibleMigrationsFolder;
 };
 
 const runMigrations = async () => {
