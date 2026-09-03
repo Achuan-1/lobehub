@@ -45,10 +45,10 @@ const serverlessBuildConfig: Pick<NextConfig, 'experimental' | 'webpack'> = {
       ),
     };
 
-    // On Netlify, Next.js 16 can leave nextRuntime undefined while compiling
-    // legacy middleware.ts. Only the explicit Node server build may include
-    // the full Better Auth and OpenTelemetry implementations.
-    if (isNetlify && nextRuntime !== 'nodejs') {
+    // Next.js 16 can leave nextRuntime undefined while compiling legacy
+    // middleware.ts on serverless providers. Only the explicit Node server
+    // build may include the full Better Auth and OpenTelemetry implementations.
+    if (nextRuntime !== 'nodejs') {
       config.resolve.alias = {
         ...config.resolve.alias,
         './instrumentation.node': resolve(
