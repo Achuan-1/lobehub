@@ -44,8 +44,8 @@ const UserUpdater = memo(() => {
         return {
           user: {
             ...baseUser,
-            // Preserve avatar from settings, don't override with auth provider value
-            avatar: baseUser?.avatar || '',
+            // Preserve an avatar set in profile settings; otherwise use the auth user image.
+            avatar: baseUser?.avatar || betterAuthUser.image || '',
             email: betterAuthUser.email,
             fullName: betterAuthUser.name,
             id: betterAuthUser.id,

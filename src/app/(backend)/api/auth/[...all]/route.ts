@@ -32,9 +32,10 @@ const getMockSession = (request: NextRequest) => {
       email: 'local-dev@localhost',
       emailVerified: true,
       id: userId,
-      name: 'Local User',
+      image: '/achuan-ai-logo.png',
+      name: '阿川 AI',
       updatedAt: now,
-      username: 'local-user',
+      username: 'achuan-ai',
     },
   });
 };

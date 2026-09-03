@@ -101,6 +101,25 @@ describe('UserUpdater', () => {
     expect(user?.avatar).toBe('');
   });
 
+  it('uses the auth user image when no profile avatar is set', () => {
+    useSessionMock.mockReturnValue(sampleSession({ image: '/achuan-ai-logo.png' }));
+
+    render(<UserUpdater />);
+
+    expect(useUserStore.getState().user?.avatar).toBe('/achuan-ai-logo.png');
+  });
+
+  it('preserves a profile avatar instead of replacing it with the auth user image', () => {
+    useUserStore.setState({
+      user: { id: 'u1', email: 'a@b.com', avatar: 'profile-avatar.png' },
+    });
+    useSessionMock.mockReturnValue(sampleSession({ image: '/achuan-ai-logo.png' }));
+
+    render(<UserUpdater />);
+
+    expect(useUserStore.getState().user?.avatar).toBe('profile-avatar.png');
+  });
+
   it('clears the user when the session goes away', () => {
     useUserStore.setState({
       user: { id: 'u1', email: 'a@b.com', interests: ['x'] },

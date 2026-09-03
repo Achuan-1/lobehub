@@ -102,6 +102,9 @@ describe('/api/auth/[...all] route', () => {
     expect(result.user).toMatchObject({
       email: 'local-dev@localhost',
       id: 'local-dev-user',
+      image: '/achuan-ai-logo.png',
+      name: '阿川 AI',
+      username: 'achuan-ai',
     });
     expect(mocks.get).not.toHaveBeenCalled();
   });
