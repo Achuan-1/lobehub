@@ -1,5 +1,6 @@
 'use client';
 
+import { BRANDING_NAME } from '@lobechat/business-const';
 import { Block, Flexbox, Icon } from '@lobehub/ui';
 import { Text } from '@lobehub/ui/base-ui';
 import { createStaticStyles, cssVar } from 'antd-style';
@@ -34,10 +35,10 @@ const User = memo<{ lite?: boolean }>(({ lite }) => {
 
   // When in a team workspace, reflect the workspace context in the header
   // (avatar + name) instead of the user's identity. Personal workspaces and
-  // OSS builds fall back to the user-level display.
+  // this shared no-login deployment use the product branding.
   const activeIdentity = useActiveIdentity();
-  const displayAvatar = activeIdentity?.avatar ?? undefined;
-  const displayName = activeIdentity?.name ?? (nickname || username);
+  const displayAvatar = activeIdentity?.avatar ?? (isSignedIn ? '/achuan-ai-logo.png' : undefined);
+  const displayName = activeIdentity?.name ?? (isSignedIn ? BRANDING_NAME : nickname || username);
 
   return (
     <UserPanel>
@@ -58,7 +59,7 @@ const User = memo<{ lite?: boolean }>(({ lite }) => {
       >
         <UserAvatar
           avatarOverride={displayAvatar}
-          nameOverride={activeIdentity?.name ?? undefined}
+          nameOverride={activeIdentity?.name ?? (isSignedIn ? BRANDING_NAME : undefined)}
           shape={'square'}
           size={28}
         />
