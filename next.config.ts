@@ -27,7 +27,7 @@ const serverlessConfig = {
   },
 };
 
-const netlifyConfig: Pick<NextConfig, 'experimental' | 'webpack'> = {
+const serverlessBuildConfig: Pick<NextConfig, 'experimental' | 'webpack'> = {
   experimental: {
     webpackBuildWorker: true,
     webpackMemoryOptimizations: true,
@@ -45,10 +45,10 @@ const netlifyConfig: Pick<NextConfig, 'experimental' | 'webpack'> = {
       ),
     };
 
-    // Next.js 16 can leave nextRuntime undefined while compiling legacy
-    // middleware.ts. Only the explicit Node server build may include the full
-    // Better Auth and OpenTelemetry implementations.
-    if (nextRuntime !== 'nodejs') {
+    // On Netlify, Next.js 16 can leave nextRuntime undefined while compiling
+    // legacy middleware.ts. Only the explicit Node server build may include
+    // the full Better Auth and OpenTelemetry implementations.
+    if (isNetlify && nextRuntime !== 'nodejs') {
       config.resolve.alias = {
         ...config.resolve.alias,
         './instrumentation.node': resolve(
@@ -65,7 +65,7 @@ const netlifyConfig: Pick<NextConfig, 'experimental' | 'webpack'> = {
 
 const nextConfig = defineConfig({
   ...(isVercel || isNetlify ? serverlessConfig : {}),
-  ...(isNetlify ? netlifyConfig : {}),
+  ...(isVercel || isNetlify ? serverlessBuildConfig : {}),
 });
 
 export default nextConfig;
